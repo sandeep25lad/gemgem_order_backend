@@ -59,13 +59,21 @@ class OrderController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateOrderStatusRequest $request, Order $order): JsonResponse
-    {
-        try {
-            $order->update($request->validated());
-            return response()->json(['message' => 'Order status updated successfully', 'order' => new OrderResource($order)]);
+    public function update(UpdateOrderStatusRequest $request, $id): JsonResponse {
+    try {
+        $order = Order::findOrFail($id); // Make sure the order exists
+        $order->update([
+           'status' => $request->validated()['status']
+        ]);
+        return response()->json([
+           'message' => 'Order status updated successfully',
+           'order' => new OrderResource($order)
+            ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to update order status', 'error' => $e->getMessage()], 500);
+            return response()->json([
+                'message' => 'Failed to update order status',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 
